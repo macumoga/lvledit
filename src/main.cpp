@@ -17,8 +17,7 @@ int main(){
 
 	while(loop){
 
-		cin
-		>> cmd;
+		cin >> cmd;
 
 		switch(cmd){
 
@@ -31,6 +30,7 @@ int main(){
 			}
 			case 'l':{
 
+				cin.ignore(1,' ');
 				getline(cin,darg);
 				cout << "Attempting to load levelmap from file " << darg << "...\n";
 				level = EditorLevelMap(darg);
@@ -40,6 +40,7 @@ int main(){
 			}
 			case 's':{
 
+				cin.ignore(1,' ');
 				getline(cin,darg);
 				cout << "Attempting to save levelmap to file " << darg << "...\n";
 				level.save(darg);

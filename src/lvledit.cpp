@@ -1,5 +1,9 @@
 
 #include "lvledit.hpp"
+using std::cout;
+using std::cerr;
+using std::setw;
+using std::setfill;
 void swap(i8& x, i8& y){
 	x ^= y;
 	y ^= x;
@@ -8,11 +12,25 @@ void swap(i8& x, i8& y){
 }
 
 void WARN_bad_tile_size(u16 size){
-	printf("\aWARNING: Tile count %u invalid for map size 300.\n", size);
+	cerr 
+	<< '\a' << "WARNING: " 
+	<< "Tile count " << size + 0 << " invalid for map size 300." 
+	<< '\n';
 }
 
 void WARN_OOB(){
-	puts("\aWARNING: Coordinate(s) out of bounds.");
+	cerr 
+	<< '\a' << "WARNING: " 
+	<< "Coordiante(s) out of bounds. No changes were made." 
+	<< '\n';
+}
+
+void WARN_file_fail(string directory){
+	cerr 
+	<< '\a' << "WARNING: " 
+	<< "Failed to open file " 
+	<< '\"' << directory << '\"' 
+	<< '.' << '\n';
 }
 
 EditorEntity::EditorEntity(i8 x, i8 y, u8 entityType){
@@ -108,7 +126,10 @@ EditorLevelMap::EditorLevelMap(string directory){
 	this->actors = vector<EditorEntity>();
 
 	std::ifstream inputLevelFile(directory);
-	if(inputLevelFile.fail()) return;
+	if(inputLevelFile.fail()){
+		WARN_file_fail(directory);
+		return;
+	};
 
 	u8 incomingFileTransferBuffer[3];
 
@@ -130,16 +151,15 @@ EditorLevelMap::EditorLevelMap(string directory){
 
 				pt = EditorPoint(leveltileWritingHead);
 
-				tilemapNotFinished = (++leveltileWritingHead < LVL_SIZE);
+				tilemapNotFinished = (leveltileWritingHead++ < LVL_SIZE);
 				if(!tilemapNotFinished) continue;
-
 				this->tiles[pt.yPosition()][pt.xPosition()] = EditorTile(incomingFileTransferBuffer[0],incomingFileTransferBuffer[1]);
 			
 			}
 
 		}
 
-		if (leveltileWritingHead != LVL_SIZE){
+		if (--leveltileWritingHead != LVL_SIZE){
 
 			WARN_bad_tile_size(leveltileWritingHead);
 			if(inputLevelFile.eof()) return;
@@ -236,25 +256,45 @@ void EditorLevelMap::save(){
 
 void EditorLevelMap::viewTiles(){
 
-	printf("\x1b[1m\n   |");
-	for(u8 n = 0; n < 20; ++n){
-		printf("  -%02d-  ", n + 1);
+	cout << std::dec << setfill('0');
+	cout << "\x1b[1m" << '\n' << "   |";
+	for(u8 n = 0; n < LVL_WIDTH; ++n){
+		cout << "  -" << setw(2) << n + 1 << "-  ";
 	}
-	printf("\x1b[0m\n");
+	cout << "\x1b[0m" << '\n';
+	u8 dispnumGraphics;
+	u8 dispnumProperty;
 
-	for(u8 y = 0; y < 15; ++y){
-		printf("%02d |", y + 1);
-		for(u8 x = 0; x < 20; ++x) printf(" %02X (%02X)", this->tiles[y][x].graphicsIndex(), this->tiles[y][x].propertyIndex());
-		putc('\n',stdout);
+	for(u8 y = 0; y < LVL_HEIGT; ++y){
+		cout << setw(2) << y + 1 << " |";
+		cout << std::hex;
+		
+		for(u8 x = 0; x < LVL_WIDTH; ++x){
+			dispnumGraphics = this->tiles[y][x].graphicsIndex();
+			dispnumProperty = this->tiles[y][x].propertyIndex();
+			cout << ' ' << setw(2) << dispnumGraphics + 0 << " (" << setw(2) << dispnumProperty + 0 << ')';
+		}
+		cout << std::dec << '\n';
 	}
-	putc('\n',stdout);
+	cout << std::dec << setw(1) << '\n';
 
 }
 
 void EditorLevelMap::viewEntities(){
 
 	u8 l = 0;
-	for(EditorEntity a : actors) printf("%2d) %02X (%2d,%2d)\n", l++, a.entityIndex(), a.xPosition(), a.yPosition());
+	cout << std::hex << setw(2) << setfill('0');
+
+	for(EditorEntity a : actors){
+		cout << std::dec
+		<< setw(2) << l++ + 0 << ") " << std::hex
+		<< setw(2) << a.entityIndex() + 0 << std::dec
+	 	<< " (" << setw(2) << a.xPosition() + 1 << ',' 
+		<< setw(2) << a.yPosition() + 1
+		<< ')' << '\n';
+	}
+
+	cout << std::dec << setw(1);
 	
 }
 

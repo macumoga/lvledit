@@ -4,9 +4,9 @@
 
 	#include <vector>
 	#include <string>
-	#include <cstdio>
 	#include <iostream>
 	#include <fstream>
+	#include <iomanip>
 	#include "rnums.h"
 
 #endif
