@@ -3,6 +3,6 @@
 ### 17-10-2026-1
  - Fixed formatting issues with file requests (l, s)
  - Rewrote io components to deprecate use of cstdio
-  - Removed cstdio from common.hpp
-  - Introduced iomanip to common.hpp
-  - Added CHANGLELOG.md
+   - Removed cstdio from common.hpp
+   - Introduced iomanip to common.hpp
+ - Added CHANGLELOG.md
