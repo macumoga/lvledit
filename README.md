@@ -14,6 +14,8 @@ Continue reading the file in 3-byte sections until you reach an entity of type 0
  - X coordinate (i8)
  - Y coordinate (i8)
  - Type (u8)
+
+All programs that support the TLB format are obligated to read at least the first 16 entities.
 ### Section 3: Validation
 The following properties are true of all valid TLB files:
  - A size in bytes that is a positive integer multiple of 3, and be at least 9 bytes long.
@@ -21,3 +23,18 @@ The following properties are true of all valid TLB files:
  - The final group must have the third byte as a value of zero, which is separate of the tile data.
 
 The minimum size of the file is not an obligation of enforcement, but an emergent property of the format. Because a single group cannot define the entire canvas of tile (as 256 < 300), two groups are required. Because the entity read is terminated by a null entity, one more group is required.
+
+## How does LVLEDIT assist in editing TLBs?
+LVLEDIT is a command-line application that loads and saves to the TLB format. The program provides the following commands:
+ - **n**: Create a blank Level.
+ - **l %s**: Load a level from the file %s.
+ - **s %s**: Save a file to %s.
+ - **e %x %d %d**: Add an entity of type %x at position (%d, %d) to the end of the entity list.
+ - **E %d**: Remove the entity at index %d.
+ - **t %x %x %d %d**: Write a tile of graphic %x and property %x to position (%d, %d).
+ - **T %x %x %d %d %d %d**: Write a tile of graphic %x and property %x to positions from (%d, %d) to (%d, %d), including those values themselves.
+ - **d**: display the tilemap.
+ - **D**: display the list of entities.
+ - **x**: exit the program and saves the current level to "unsaved.tlb".
+
+The program is written in c++. The existing makefiles require g++ to be installed and a valid command. For windows, run make.bat. For Linux, make (the makefile uses extension uba to denote an application).
